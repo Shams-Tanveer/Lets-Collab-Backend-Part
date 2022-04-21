@@ -4,8 +4,6 @@ import com.example.Web.Project.model.User;
 import com.example.Web.Project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import javax.transaction.Transactional;
 
 @Service
@@ -19,11 +17,11 @@ public class UserServiceImpl implements UserService{
     public int addUser(User user) {
         boolean isExist = repository.existsByEmail(user.getEmailid());
 
-        System.out.println(isExist);
         if(isExist)
         {
             User user1 = repository.getUserByEmail(user.getEmailid());
             if(user1.getName().isEmpty() && user1.getPassword().isEmpty()){
+                user.setId(user1.getId());
                 repository.save(user);
                 return 1;
             }else
@@ -33,7 +31,6 @@ public class UserServiceImpl implements UserService{
         }
         else
         {
-           // String filename = StringUtils.cleanPath(user.getImage().get)
             repository.save(user);
             return 1;
         }
@@ -68,7 +65,6 @@ public class UserServiceImpl implements UserService{
         {
             user = repository.getUserByEmail(userEmail);
         }
-
         return user;
     }
 

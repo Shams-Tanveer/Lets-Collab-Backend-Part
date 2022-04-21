@@ -81,6 +81,11 @@ public class UserController {
         userService.updateUser(user);
     }
 
+    @PostMapping("/logoutUser")
+    public void logOutUser(HttpServletRequest request){
+        request.getSession(false).invalidate();
+    }
+
     @Data
     class PostResponse {
         private int resultCode;

@@ -17,7 +17,6 @@ public class AuthFilter implements Filter {
         HttpServletRequest request1 = (HttpServletRequest) request;
         HttpServletResponse response1 = (HttpServletResponse) response;
         String path = request1.getRequestURI();
-        System.out.println(path);
         if(request1.getSession(false) !=null)
         {
             if(path.equals("/task/groupTask"))
@@ -46,7 +45,6 @@ public class AuthFilter implements Filter {
             {
                 chain.doFilter(request,response);
             }
-
         }
         else {
             response1.sendError(401);
