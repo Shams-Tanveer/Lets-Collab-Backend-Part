@@ -16,6 +16,8 @@ import org.springframework.web.context.annotation.SessionScope;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -51,7 +53,6 @@ public class TaskController {
         List<Task> taskList = new ArrayList<Task>();
         String projectID = (String) request.getSession(false).getAttribute("curProjectID");
         String userID = (String) request.getSession(false).getAttribute("userID");
-        System.out.println(projectID);
         taskList = taskService.getIndividualTask(userID, projectID);
         return taskList;
     }
@@ -61,28 +62,12 @@ public class TaskController {
 
         String taskID = (String) request.getSession(false).getAttribute("curTaskID");
         Task task = taskService.getSpecificTask(taskID);
-        System.out.println(task.getProjectID());
         List<ProjectController.CustomUser> members = projectService.getMembers(task.getProjectID());
         CustomTask customTask = new CustomTask();
         customTask.setTask(task);
         customTask.setMembers(members);
         return customTask;
     }
-
-    @PostMapping("/selectProject")
-    public void setSelectedProject(@RequestBody String projectID, HttpServletRequest request) {
-        projectID = projectID.substring(1, projectID.length() - 1);
-        HttpSession session = request.getSession(false);
-        session.setAttribute("curProjectID", projectID);
-        Project project = projectService.getOneProject(projectID);
-        if (project.getProjectAdmin().equals(session.getAttribute("userID"))) {
-            session.setAttribute("role", "master");
-        } else {
-            session.setAttribute("role", "member");
-        }
-        System.out.println(projectID);
-    }
-
 
     @PostMapping("/movetask")
     public ResponseMessage moveTask(@RequestBody MovedTaskInfo movedTaskInfo, HttpServletRequest request) {
@@ -114,14 +99,22 @@ public class TaskController {
 
     @PostMapping("/addTask")
     public void addTask(@RequestBody Task task, HttpServletRequest request) {
-        System.out.println(task.getName());
         task.setCompletedsubtask(0);
         task.setComplete(false);
         task.setProjectID((String) request.getSession(false).getAttribute("curProjectID"));
         task.setTotalsubtask(1);
         task.setType("todo");
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 7 * task.getCompleteIn());
+        task.setDueDate(calendar.getTime());
         Task task1 = taskService.addTask(task);
-        System.out.println(task1.getName());
+    }
+
+    @PostMapping("/updateTask")
+    public void updateTask(@RequestBody Task task) {
+        taskService.updateTask(task);
     }
 
     @GetMapping("/deleteTask")

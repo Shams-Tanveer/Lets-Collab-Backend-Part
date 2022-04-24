@@ -36,8 +36,6 @@ public class ProjectController {
     @PostMapping(value = "/newProject")
     public void addProject(@RequestBody Project project,HttpServletRequest request) {
         String latestProjectID = "";
-        System.out.println("HiHlw");
-        System.out.println(project.getProjectName());
         HttpSession session = request.getSession(false);
         if(project.getProjectAdmin().equals("You are the admin"))
         {
@@ -52,7 +50,6 @@ public class ProjectController {
         Project project1 = projectService.addProject(project);
         latestProjectID = project1.getId();
         session.setAttribute("curProjectID",project1.getId());
-        System.out.println(latestProjectID);
         projectService.addMember(latestProjectID,project.getProjectAdmin());
 
         if(!project.getProjectAdmin().equals(session.getAttribute("userID"))){
@@ -60,7 +57,6 @@ public class ProjectController {
         }
     }
 
-    /* OK Up To 07-04-22*/
     @GetMapping("/getProject")
     public List<Project> getProjectList(HttpServletRequest request) {
 
@@ -82,7 +78,6 @@ public class ProjectController {
     @PostMapping("/deleteProjectMember")
     public void deleteMember(@RequestBody MemberCredentials memberCredentials,HttpServletRequest request)
     {
-        System.out.println("Called Delete Memvber");
         HttpSession session = request.getSession(false);
         String projectID = (String) session.getAttribute("curProjectID");
         projectService.deleteMember(projectID,memberCredentials.getMemberID());
@@ -90,11 +85,6 @@ public class ProjectController {
 
     @GetMapping("/getMembers")
     public List<CustomUser> getMembers(HttpServletRequest request){
-
-        //List<String> members = projectService.getMembers(projectID);
-        //For Resure
-        System.out.println("Get Members");
-        System.out.println(request.getSession(false).getAttribute("curProjectID"));
         List<CustomUser> members = projectService.getMembers((String) request.getSession(false).getAttribute("curProjectID"));
         return members;
     }
@@ -104,22 +94,32 @@ public class ProjectController {
     {
         PostResponse postResponse = new PostResponse();
         HttpSession session = request.getSession(false);
-        System.out.println("Callin Complete");
         if(session.getAttribute("role").equals("master"))
         {
-            System.out.println("ROle");
             postResponse.setResultCode(1);
             postResponse.setResultInLng("Project Mark As Complete");
             projectService.updateProjectCompletion((String) session.getAttribute("curProjectID"));
         }
         else
         {
-            System.out.println("ROle1");
             postResponse.setResultCode(0);
             postResponse.setResultInLng("You are not the Master");
         }
 
         return postResponse;
+    }
+
+    @PostMapping("/selectProject")
+    public void setSelectedProject(@RequestBody String projectID, HttpServletRequest request) {
+        projectID = projectID.substring(1, projectID.length() - 1);
+        HttpSession session = request.getSession(false);
+        session.setAttribute("curProjectID", projectID);
+        Project project = projectService.getOneProject(projectID);
+        if (project.getProjectAdmin().equals(session.getAttribute("userID"))) {
+            session.setAttribute("role", "master");
+        } else {
+            session.setAttribute("role", "member");
+        }
     }
 
     @GetMapping("/chat")

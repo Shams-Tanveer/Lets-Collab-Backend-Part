@@ -44,12 +44,12 @@ public class VideoChatController {
             tokenInfo.setTokenID("Couldn't Found");
             tokenInfo.setProjectName(project.getProjectName());
         } else {
-            VideoCall videoCall = videoCallService.getToken("project1840_00009");
+            VideoCall videoCall = videoCallService.getToken((String) request.getSession(false).getAttribute("curProjectID"));
             Date d1 = videoCall.getCreatedAt();
             Date d2 = new Date();
             long difference = d2.getTime()-d1.getTime();
             long dif_min = (long) Math.floor(((difference) /1000)/60);
-            if(dif_min<60)
+            if(dif_min<120)
             {
                 tokenInfo.setResultCode(1);
                 tokenInfo.setTokenID(videoCall.getTokenId());
@@ -60,7 +60,6 @@ public class VideoChatController {
                 tokenInfo.setTokenID("TimeOut");
                 tokenInfo.setProjectName(project.getProjectName());
             }
-            System.out.println(dif_min);
 
         }
         return tokenInfo;

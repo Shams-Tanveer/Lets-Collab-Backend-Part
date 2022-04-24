@@ -13,6 +13,12 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository repository;
 
+    /*
+    * This method is used for registration purpose. Basically it first checks the provided email exists or not.
+    * If exists then the name and password against the email are checked.If name and password both are equal to ""
+    * that means user is not registered and user is registered in the database. If not equal to zero then user is registered
+    * already and 0 is returned. If email doesn't exist, user is registered and 1 is returned.
+    * */
     @Override
     public int addUser(User user) {
         boolean isExist = repository.existsByEmail(user.getEmailid());
@@ -21,8 +27,7 @@ public class UserServiceImpl implements UserService{
         {
             User user1 = repository.getUserByEmail(user.getEmailid());
             if(user1.getName().isEmpty() && user1.getPassword().isEmpty()){
-                user.setId(user1.getId());
-                repository.save(user);
+                repository.registerAssignedUser(user1.getId(), user.getName(), user.getPassword(), user.getImage());
                 return 1;
             }else
             {
@@ -34,7 +39,6 @@ public class UserServiceImpl implements UserService{
             repository.save(user);
             return 1;
         }
-
     }
 
     @Override

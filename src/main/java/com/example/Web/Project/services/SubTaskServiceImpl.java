@@ -18,6 +18,11 @@ public class SubTaskServiceImpl implements SubTaskService{
     }
 
     @Override
+    public SubTask getSingleSubTask(String subTaskID) {
+        return subTaskRepository.getById(subTaskID);
+    }
+
+    @Override
     public void updateSubTask(String subTaskID,String subTaskName,boolean isComplete) {
         subTaskRepository.updateSubTaskName(subTaskID,subTaskName,isComplete);
     }

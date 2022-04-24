@@ -31,8 +31,6 @@ public class SubTaskController {
     public List<SubTask> getAllSubTask(HttpServletRequest request)
     {
         String taskID = (String) request.getSession(false).getAttribute("curTaskID");
-        System.out.println(taskID);
-        System.out.println("Get SUb Task");
         List<SubTask> subTaskList = subTaskService.getSubTask(taskID);
         return subTaskList;
     }
@@ -40,20 +38,18 @@ public class SubTaskController {
     @PostMapping("/updateSubTask")
     public void updateSubTask(@RequestBody SubTask subTask,HttpServletRequest request)
     {
-        System.out.println(subTask.isComplete());
-        subTaskService.updateSubTask(subTask.getId(),subTask.getName(),subTask.isComplete());
-
+        SubTask subTask1 = (SubTask) subTaskService.getSingleSubTask(subTask.getId());
         HttpSession session = request.getSession(false);
-        System.out.println(session.getAttribute("userID")+"HLWLW");
         String taskID = (String) session.getAttribute("curTaskID");
-        if(subTask.isComplete())
+        if(subTask.isComplete() && !subTask1.isComplete())
         {
             taskService.updateCompleteSubTaskNumber(1,taskID);
         }
-        else
+        else if(!subTask.isComplete())
         {
             taskService.updateCompleteSubTaskNumber(-1,taskID);
         }
+        subTaskService.updateSubTask(subTask.getId(),subTask.getName(),subTask.isComplete());
     }
 
 
@@ -62,13 +58,11 @@ public class SubTaskController {
     {
         taskID = taskID.substring(1,taskID.length()-1);
         request.getSession(false).setAttribute("curTaskID", taskID);
-        System.out.println( request.getSession(false).getAttribute("curTaskID"));
     }
 
     @PostMapping("/addSubTask")
     public void addSubTask(@RequestBody SubTask subTask,HttpServletRequest request)
     {
-        System.out.println(subTask.getName());
         subTask.setTaskID((String) request.getSession(false).getAttribute("curTaskID"));
         subTaskService.addSubTask(subTask);
         taskService.updateTotalSubTaskNumber(1, subTask.getTaskID());
@@ -77,9 +71,15 @@ public class SubTaskController {
     @PostMapping("/deleteSubTask")
     public void deleteSubTask(@RequestBody String subTaskID,HttpServletRequest request)
     {
+
         subTaskID = subTaskID.substring(1,subTaskID.length()-1);
+        SubTask subTask = subTaskService.getSingleSubTask(subTaskID);
         subTaskService.deleteSubTask(subTaskID);
         taskService.updateTotalSubTaskNumber(-1, (String) request.getSession(false).getAttribute("curTaskID"));
+        if(subTask.isComplete())
+        {
+            taskService.updateCompleteSubTaskNumber(-1,(String) request.getSession(false).getAttribute("curTaskID"));
+        }
     }
     @Data
     public static class SubTaskInfo{

@@ -28,8 +28,6 @@ public class ProjectServiceImp implements ProjectService{
 
     @Override
     public List<Project> getUserProject(String userID) {
-        //User user = userRepository.getById(userID);
-        //return user.getProjectSet();
         return projectRepository.getUserProject(userID);
     }
 

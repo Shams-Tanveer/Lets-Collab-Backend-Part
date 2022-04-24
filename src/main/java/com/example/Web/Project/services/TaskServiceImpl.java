@@ -28,6 +28,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public void updateTask(Task task) {
+        taskRepository.updateTask(task.getId(),task.getName(),task.getAssignedTo(),task.getCompleteIn());
+    }
+
+    @Override
     public void updateTaskType(String type, String taskID) {
         taskRepository.updateTaskType(type, taskID);
     }

@@ -7,6 +7,7 @@ import java.util.List;
 public interface TaskService {
     public List<Task> getGroupTask(String projectID);
     public Task getSpecificTask(String taskID);
+    public void updateTask(Task task);
     public void updateTaskType(String type,String taskID);
     public void updateTaskComplete(String taskID);
     public void updateCompleteSubTaskNumber(int value,String taskID);

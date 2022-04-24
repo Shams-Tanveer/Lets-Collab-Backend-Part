@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.xml.crypto.Data;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +28,15 @@ public class Task {
     private int completedsubtask;
     private String projectID;
     private String assignedTo;
+    private Date dueDate;
 
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
 
     @JsonIgnore
     @OneToMany(targetEntity = SubTask.class,cascade = CascadeType.ALL)

@@ -38,6 +38,11 @@ public interface TaskRepository extends JpaRepository<Task,String> {
     @Query(value = "UPDATE task set is_complete = true where id=?1",nativeQuery = true)
     public void updateTaskComplete(String taskID);
 
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE task set name=?2, assigned_to =?3,complete_in=?4 where id=?1",nativeQuery = true)
+    public void updateTask(String taskID,String name,String assignedTo,int completeIn);
+
 
     @Query(value = "SELECT * FROM task WHERE assigned_to=?1 and projectid= ?2",nativeQuery = true)
     public List<Task> getIndividualTask(String userID,String projectID);

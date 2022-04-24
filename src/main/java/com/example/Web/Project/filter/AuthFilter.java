@@ -43,7 +43,14 @@ public class AuthFilter implements Filter {
             }
             else
             {
-                chain.doFilter(request,response);
+                if(request1.getSession(false).getAttribute("userID")!=null)
+                {
+                    chain.doFilter(request,response);
+                }
+                else
+                {
+                    response1.sendError(404);
+                }
             }
         }
         else {

@@ -21,9 +21,12 @@ public class UserController {
     private UserService userService;
 
 
+    /*
+    This post mapping is used for user registration. It calls the UserService interface addUser method.
+    If the method returns 1 then user is registered otherwise user has already registered with the email.
+     */
     @PostMapping(value = "/add")
     public PostResponse add(@RequestBody User user, HttpServletRequest request) {
-        System.out.println(user);
         PostResponse postResponse = new PostResponse();
         int insertResult = userService.addUser(user);
         HttpSession session = request.getSession();
@@ -36,10 +39,15 @@ public class UserController {
         } else {
             postResponse.setResultInLng("The email exits. Try with another one");
         }
-        System.out.println(session.getAttribute("userID"));
         return postResponse;
     }
 
+    /*
+    * This post mapping is used for user sign in. It checks first whether the provided email exists in the database.If exists
+    * the provided password is checked with the database and if it is matched a session is created otherwise
+    * Email and Password Doesn't Match message is returned to the user. If email doesn't exist Email Does Not Exist message
+    * is returned to the user.
+     */
     @PostMapping("/finduser")
     public PostResponse findUser(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
         boolean isExist = userService.checkExistByEmail(user.getEmailid());
@@ -67,6 +75,10 @@ public class UserController {
         }
     }
 
+    /*
+    * This get mapping returns user basic information.
+     */
+
     @GetMapping("/userDetails")
     public User getUserDetails(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -75,17 +87,48 @@ public class UserController {
         return user;
     }
 
+    /*
+    * As the name suggests, this url is called to update user information.
+    * */
     @PostMapping("/updateUser")
     public void updateUserDetails(@RequestBody User user, HttpServletRequest request) {
-        System.out.println("Update User");
         userService.updateUser(user);
     }
 
+    /*
+    * logOutUser method invalidate the session when user click on the logout button.
+    * */
     @PostMapping("/logoutUser")
     public void logOutUser(HttpServletRequest request){
         request.getSession(false).invalidate();
     }
 
+    /*
+    * As our web application allows only project master do some special task such as assign task or mark project as complete.
+    * This isMaster function returns 1 if currently accessing user is master otherwise 0 as a response.
+    * */
+
+    @PostMapping("/getRole")
+    public PostResponse isMaster(HttpServletRequest request)
+    {
+        PostResponse postResponse = new PostResponse();
+        if(request.getSession(false).getAttribute("role").equals("master"))
+        {
+            postResponse.setResultCode(1);
+            postResponse.setResultInLng("User Has Permission");
+        }
+        else
+        {
+            postResponse.setResultCode(0);
+            postResponse.setResultInLng("Only project master can assign task.");
+        }
+      return postResponse;
+    }
+
+
+    /*
+    * This is a custom class to send response to the front end.
+    * */
     @Data
     class PostResponse {
         private int resultCode;
